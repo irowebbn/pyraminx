@@ -76,11 +76,18 @@ layout of the cube provided.
 # Heuristic
 
 # GUI
+In addition to the input interface described above, this program provides a
+basic graphical output, which simply prints an unfolded view of the puzzle to
+the terminal. This allows the user to see the state of the puzzle after each
+step. The terminal to which output is written must support ANSI color codes. To
+check if your terminal supports this, run `tput colors`. The value returned
+should be at least 8 for the coloring to work. If you see garbage characters
+printed to the output, your terminal probably doesn't support this.
 
-The terminal to which output is written must support ANSI color codes. To check
-if your terminal supports this, run `tput colors`. The value returned should be
-at least 8 for the coloring to work. If you see garbage characters printed to
-the output, your terminal probably doesn't support this.
+You can see an example of the visualization in the file `GUI_Output.png`. This
+shows the state of the puzzle after the moves B3, R0, U3.
+
+![GUI output](GUI_Output.png)
 
 It can be difficult to read diagonal layers, since unlike interlocking
 triangles, characters must exclusively occupy their own discrete space. Future
