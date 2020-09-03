@@ -16,20 +16,75 @@ Pyraminx::Pyraminx(){
    setNeighbors();
 }
 void Pyraminx::turn(Corner corner, int layer, Direction dir){
-    // TODO: account for middle layer twist
-    // TODO: fix back corner twists- returns nullptr from blue_face
-    // take corner, lookup 3 adjacent faces, do ring below for them
-    std::shared_ptr<Face> sending_face = blue_face->get_sending_neighbor(corner, dir);
-    std::shared_ptr<Face> receiving_face = blue_face->get_receiving_neighbor(corner, dir);
-    std::vector<Color> sender_color = sending_face->get_layer(corner, layer);
-    std::vector<Color> old_color = blue_face->update_layer(corner, layer, sender_color);
-    std::vector<Color> receiver_old_color = receiving_face->update_layer(corner, layer, old_color);
-    sending_face->update_layer(corner, layer, receiver_old_color);
+    // To keep the middle piece fixed in our view,
+    // treat middle layer twists as counter-twists of all other layers
+    if(layer == 2){
+        if(dir == Direction::clockwise){
+            dir = Direction::counterclockwise;
+        }
+        else{
+            dir = Direction::clockwise;
+        }
+        turn(corner, 0, dir);
+        turn(corner, 1, dir);
+        turn(corner, 3, dir);
+    }
+    else{
+        // If we are turning from the back corner, treat 
+        // the green face as the reference face. 
+        // Otherwise use the blue face as the reference.
+        std::shared_ptr<Face> ref_face;
+        if(corner == Corner::B){
+            ref_face = green_face;
+        }
+        else{
+            ref_face = blue_face;
+        }
+        std::shared_ptr<Face> sending_face = ref_face->get_sending_neighbor(corner, dir);
+        std::shared_ptr<Face> receiving_face = ref_face->get_receiving_neighbor(corner, dir);
+        std::vector<Color> sender_color = sending_face->get_layer(corner, layer);
+        std::vector<Color> old_color = ref_face->update_layer(corner, layer, sender_color);
+        std::vector<Color> receiver_old_color = receiving_face->update_layer(corner, layer, old_color);
+        sending_face->update_layer(corner, layer, receiver_old_color);
+    }
 }
 
 void Pyraminx::print(){
-    for(int i = 0; i < face_list.size(); i++){
-        face_list[i]->print();
+    for(int layer = 0; layer < 4; layer++){
+        int top_row_len = 2*layer +1;
+        int bottom_row_len = (7- top_row_len) + 1;
+        for(int j = 0; j < (7-bottom_row_len)/2; j++){
+            printf(" ");
+        }
+        for(int entry = 0; entry < bottom_row_len; entry++){
+            red_face->print_triangle(Corner::L, 3-layer, (bottom_row_len - 1) - entry);
+        }
+        printf(" ");
+        for(int entry = 0; entry < top_row_len; entry++){
+            blue_face->print_triangle(Corner::U, layer, entry);
+        }
+        printf(" ");
+        for(int entry = 0; entry < bottom_row_len; entry++){
+            yellow_face->print_triangle(Corner::R, 3-layer, (bottom_row_len - 1) - entry);
+        }
+        for(int j = 0; j < (7-bottom_row_len)/2; j++){
+                printf(" ");
+        }
+        printf("\n");
+    }
+    for(int layer = 3; layer >=0; layer--){
+        int row_len = layer*2 + 1;
+        printf("     "); // Offset so green appears below blue
+        for(int j = 0; j < (7 - row_len)/2; j++){
+                printf(" ");
+        }
+        for(int entry = row_len - 1; entry >= 0; entry--){
+            green_face->print_triangle(Corner::B, layer, entry);
+        }
+        for(int j = 0; j < (7 - row_len)/2; j++){
+                printf(" ");
+        }
+        printf("\n");
     }
 }
 void Pyraminx::setNeighbors(){

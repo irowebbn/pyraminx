@@ -127,34 +127,42 @@ std::shared_ptr<Face> Face::get_sending_neighbor(Corner corner, Direction dir){
     }
     return get_sending_neighbor(corner, dir);
  }
-
+void Face::print_triangle(Corner ref_corner, int layer, int entry){
+    Position lookup_pos{.reference_corner = ref_corner, .layer = layer, .entry = entry};
+    Color triangle_color = *(current_state.find(lookup_pos)->second);
+    switch (triangle_color)
+    {
+    case Color::blue:
+        printf("\033[1;34mB\033[0m");
+        break;
+    case Color::red:
+        printf("\033[1;31mR\033[0m");
+        break;             
+    case Color::yellow:
+        printf("\033[1;33mY\033[0m");
+        break;
+    case Color::green:
+        printf("\033[1;32mG\033[0m");
+        break;
+    default:
+        break;
+    }
+}
 void Face::print(){
-
-    int entry = 0;
-    for(int row_len = 1; row_len <= 7; row_len = row_len + 2){
+    Corner ref_corner;
+    if(center_color == Color::green){
+        ref_corner = Corner::B;
+    }
+    else{
+        ref_corner = Corner::U;
+    }
+    for(int layer = 0; layer < 4; layer++){
+        int row_len = 2*layer + 1;
         for(int j = 0; j < (7-row_len)/2; j++){
             printf(" ");
         }
-        for(int j = 0; j < row_len; j++){
-            switch (color_data[entry])
-            {
-            case Color::blue:
-                printf("\033[1;34mB\033[0m");
-                break;
-            case Color::red:
-                printf("\033[1;31mR\033[0m");
-                break;             
-            case Color::yellow:
-                printf("\033[1;33mY\033[0m");
-                break;
-            case Color::green:
-                printf("\033[1;32mG\033[0m");
-                break;
-            default:
-                break;
-            }
-            //printf("%i", color_data[entry]);
-            entry++;
+        for(int entry = 0; entry < row_len; entry++){
+            print_triangle(ref_corner, layer, entry);
         }
         for(int j = 0; j < (7-row_len)/2; j++){
             printf(" ");

@@ -41,7 +41,7 @@ Eq_Pos_Table::Eq_Pos_Table(){
                 break;
             }
             eq1.entry = 2*layer  - entry;
-            eq2.entry = 2*layer  - entry;
+            eq2.entry = 2*(eq2.layer)  - entry;
 
             
             eq1.reference_corner = Corner::R;

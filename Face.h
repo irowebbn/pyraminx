@@ -51,10 +51,10 @@ struct Neighborhood{
 class Face{
 public:
     Face(Color center_color, Eq_Pos_Table& eq_pos_table);
-    //void turn(Corner corner, int level, Direction dir);
     std::vector<Color> get_layer(Corner corner, int layer);
     std::vector<Color> update_layer(Corner corner, int layer, std::vector<Color> new_layer);
     void print();
+    void print_triangle(Corner ref_corner, int layer, int entry);
     void set_neighbors(Neighborhood neighbors);
     Color get_center_color(){return center_color;};
     std::shared_ptr<Face> get_sending_neighbor(Corner corner, Direction dir);
