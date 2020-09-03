@@ -40,9 +40,31 @@ void Face::build_map(Corner reference_corner, Eq_Pos_Table& eq_pos_table){
         }
     }
 }
+std::vector<Color> Face::get_layer(Corner corner, int layer){
+    std::vector<Color> desired_layer;
+    Position to_access;
+    to_access.layer =  layer;
+    to_access.reference_corner = corner;
+    for(int entry = 0; entry < 2*layer + 1; entry++){
+        to_access.entry = entry;
+        desired_layer.push_back(*current_state.find(to_access)->second);
+    }
+    return desired_layer;
+}
 
-void Face::turn(Corner corner, int level, Direction dir){
-    
+// There's some repetition here, but I didn't want to have to transverse the 
+// layer twice by calling get_layer.
+std::vector<Color> Face::update_layer(Corner corner, int layer, std::vector<Color> new_layer){
+    std::vector<Color> old_layer;
+    Position to_access;
+    to_access.layer =  layer;
+    to_access.reference_corner = corner;
+    for(int entry = 0; entry < 2*layer + 1; entry++){
+        to_access.entry = entry;
+        old_layer.push_back(*current_state.find(to_access)->second);
+        *(current_state[to_access]) = new_layer[entry];
+    }
+    return old_layer;
 }
 
 void Face::update_triangle(Position pos_to_update){
@@ -55,6 +77,57 @@ void Face::update_triangle(Position pos_to_update){
     // other corners need to be double dereferenced
 }
 
+std::shared_ptr<Face> Face::get_sending_neighbor(Corner corner, Direction dir){
+    switch (corner)
+    {
+    case Corner::U:
+        if(dir == Direction::clockwise){
+            return neighbors.U_neighbor_right;
+        }
+        else{
+            return neighbors.U_neighbor_left;
+        }
+        break;
+    case Corner::L:
+        if(dir == Direction::clockwise){
+            return neighbors.L_neighbor_right;
+        }
+        else{
+            return neighbors.L_neighbor_left;
+        }
+        break;
+    case Corner::R:
+        if(dir == Direction::clockwise){
+            return neighbors.R_neighbor_right;
+        }
+        else{
+            return neighbors.R_neighbor_left;
+        }
+        break;
+    case Corner::B:
+        if(dir == Direction::clockwise){
+            return neighbors.B_neighbor_right;
+        }
+        else{
+            return neighbors.B_neighbor_left;
+        }
+        break;
+    default:
+        printf("Invalid move specified");
+        break;
+    }
+}
+
+ std::shared_ptr<Face> Face::get_receiving_neighbor(Corner corner, Direction dir){
+    if(dir == Direction::clockwise){
+        dir = Direction::counterclockwise;
+    }
+    else{
+        dir = Direction::clockwise;
+    }
+    return get_sending_neighbor(corner, dir);
+ }
+
 void Face::print(){
 
     int entry = 0;
@@ -63,7 +136,24 @@ void Face::print(){
             printf(" ");
         }
         for(int j = 0; j < row_len; j++){
-            printf("%i", color_data[entry]);
+            switch (color_data[entry])
+            {
+            case Color::blue:
+                printf("\033[1;34mB\033[0m");
+                break;
+            case Color::red:
+                printf("\033[1;31mR\033[0m");
+                break;             
+            case Color::yellow:
+                printf("\033[1;33mY\033[0m");
+                break;
+            case Color::green:
+                printf("\033[1;32mG\033[0m");
+                break;
+            default:
+                break;
+            }
+            //printf("%i", color_data[entry]);
             entry++;
         }
         for(int j = 0; j < (7-row_len)/2; j++){

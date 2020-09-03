@@ -34,7 +34,6 @@ struct Position{
     Corner reference_corner;
     int layer;
     int entry;
-
 };
 
 
@@ -52,14 +51,17 @@ struct Neighborhood{
 class Face{
 public:
     Face(Color center_color, Eq_Pos_Table& eq_pos_table);
-    void turn(Corner corner, int level, Direction dir);
+    //void turn(Corner corner, int level, Direction dir);
+    std::vector<Color> get_layer(Corner corner, int layer);
+    std::vector<Color> update_layer(Corner corner, int layer, std::vector<Color> new_layer);
     void print();
     void set_neighbors(Neighborhood neighbors);
     Color get_center_color(){return center_color;};
+    std::shared_ptr<Face> get_sending_neighbor(Corner corner, Direction dir);
+    std::shared_ptr<Face> get_receiving_neighbor(Corner corner, Direction dir);
 private:
     Color center_color;
     std::map< Position, Color* > current_state;
-    // std::shared_ptr<Color[]> color_data(Color[16]);
     Color color_data[16];
     Neighborhood neighbors;
     void update_triangle(Position pos_to_update);

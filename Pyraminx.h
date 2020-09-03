@@ -7,7 +7,7 @@ class Pyraminx{
     public:
     Pyraminx();
     void print();
-    void turn(Corner corner, int level, Direction dir);
+    void turn(Corner corner, int layer, Direction dir);
     void scramble();
     void setNeighbors();
     private:
