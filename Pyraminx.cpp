@@ -12,10 +12,9 @@ Pyraminx::Pyraminx(){
     face_list.push_back(red_face);
     face_list.push_back(yellow_face);
     face_list.push_back(green_face); 
-
    setNeighbors();
 }
-void Pyraminx::turn(Corner corner, int layer, Direction dir){
+void Pyraminx::turn_layer(Corner corner, int layer, Direction dir){
     // To keep the middle piece fixed in our view,
     // treat middle layer twists as counter-twists of all other layers
     if(layer == 2){
@@ -25,9 +24,9 @@ void Pyraminx::turn(Corner corner, int layer, Direction dir){
         else{
             dir = Direction::clockwise;
         }
-        turn(corner, 0, dir);
-        turn(corner, 1, dir);
-        turn(corner, 3, dir);
+        turn_layer(corner, 0, dir);
+        turn_layer(corner, 1, dir);
+        turn_layer(corner, 3, dir);
     }
     else{
         // If we are turning from the back corner, treat 
@@ -46,6 +45,57 @@ void Pyraminx::turn(Corner corner, int layer, Direction dir){
         std::vector<Color> old_color = ref_face->update_layer(corner, layer, sender_color);
         std::vector<Color> receiver_old_color = receiving_face->update_layer(corner, layer, old_color);
         sending_face->update_layer(corner, layer, receiver_old_color);
+
+        // If we rotate a base layer, we are also rotating the face 
+        // opposite the corner in the reverse direction
+        if(layer == 3){
+            if(dir == Direction::clockwise){
+                dir = Direction::counterclockwise;
+            }
+            else{
+                dir = Direction::clockwise;
+            }
+            get_opposite_face(corner)->turn_face(dir);
+        }
+    }
+}
+
+std::shared_ptr<Face> Pyraminx::get_opposite_face(Corner corner){
+    switch (corner)
+    {
+    case Corner::U:
+        return green_face;
+        break;
+    case Corner::L:
+        return yellow_face;
+        break;
+    case Corner::R:
+        return red_face;
+        break;
+    case Corner::B:
+        return blue_face;
+        break;
+    default:
+        return blue_face;
+        printf("Invalid corner specified.\n");
+        break;
+    }
+}
+
+void Pyraminx::scramble(int depth){
+    std::random_device generator;
+    std::uniform_int_distribution<int> corner_layer_dist(0, 3);
+    std::uniform_int_distribution<int> dir_dist(0, 1);
+
+    // Some help here from zildjohn01, cc by-sa 
+    // https://stackoverflow.com/questions/2999012/generating-random-enums
+    // Tip is to use static_cast to castrandom int to an enum
+    // That way I can randomly choose a corner and direction.
+    for(int i = 0; i < depth; i++){
+        int random_layer = corner_layer_dist(generator);
+        Corner random_corner = static_cast<Corner>(corner_layer_dist(generator));
+        Direction random_direction = static_cast<Direction>(dir_dist(generator));
+        turn_layer(random_corner, random_layer, random_direction);
     }
 }
 

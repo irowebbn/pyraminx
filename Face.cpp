@@ -1,6 +1,5 @@
 #include "Face.h"
 
-
 Face::Face(Color center_color, Eq_Pos_Table& eq_pos_table){
     this->center_color = center_color;
     for(int i = 0; i < 16; i++){
@@ -67,14 +66,19 @@ std::vector<Color> Face::update_layer(Corner corner, int layer, std::vector<Colo
     return old_layer;
 }
 
-void Face::update_triangle(Position pos_to_update){
-    // If face center color is blue, yellow, or red
-    // upper corner can be dereferenced immediately
-    // other corners need to be double dereferenced
-
-    // if face color is green
-    // Back corner can be dereferenced immediately
-    // other corners need to be double dereferenced
+void Face::turn_face(Direction dir){
+    Color color_tmp[16];
+    std::memcpy(color_tmp, color_data, 16*sizeof(Color));
+    int turn_map[16];
+    if(dir == Direction::clockwise){
+        std::memcpy(turn_map, cw_rotation, 16*sizeof(int));
+    }
+    else{
+        std::memcpy(turn_map, ccw_rotation, 16*sizeof(int));
+    }
+    for(int i = 0; i < 16; i++){
+        color_data[i] = color_tmp[turn_map[i]];
+    }
 }
 
 std::shared_ptr<Face> Face::get_sending_neighbor(Corner corner, Direction dir){

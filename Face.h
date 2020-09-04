@@ -4,6 +4,7 @@
 #include <memory>
 #include <map>
 #include <cstdio>
+#include <cstring>
 #include <vector>
 
 #include "Eq_Pos_Table.h"
@@ -59,12 +60,16 @@ public:
     Color get_center_color(){return center_color;};
     std::shared_ptr<Face> get_sending_neighbor(Corner corner, Direction dir);
     std::shared_ptr<Face> get_receiving_neighbor(Corner corner, Direction dir);
+    void turn_face(Direction dir);
 private:
     Color center_color;
     std::map< Position, Color* > current_state;
+    // These are the "magic" mappings of the positions of a face
+    // from before (index) to after (value) a turn.
+    int cw_rotation[16] = { 9, 11, 10,  4, 13, 12, 6,  5,  1, 15, 14, 8, 7, 3,  2, 0};
+    int ccw_rotation[16] = {15,  8, 14, 13,  3,  7, 6, 12, 11,  0,  2, 1, 5, 4, 10, 9 };
     Color color_data[16];
     Neighborhood neighbors;
-    void update_triangle(Position pos_to_update);
     void build_map(Corner reference_corner, Eq_Pos_Table& eq_pos_table);
 };
 
