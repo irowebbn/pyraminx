@@ -8,7 +8,7 @@ int main(){
     Pyraminx myPyraminx;
     std::string input;
     bool quit = false;
-    printf("Enter a command of the form LX[`] where L is the letter corresponding with a \n"
+    printf("Enter a command of the form AX[`] where L is the letter corresponding with a \n"
            "corner of the Pyraminx (U, L, R, B),  X is a integer from 0-3 specifying the \n"
            "layer of the row relative to the tip (layer 0) at the corner given, and the \n"
            "optional ` mark indicates whether the layer should be turned counterclockwise.\n"
@@ -32,10 +32,11 @@ int main(){
             }
             printf("\n");
             myPyraminx.print();
-        }
-    }
-}
+        } //if not empty
+    }// while
+}// main
 
+// Takes user input and makes corresponding call to Pyraminx::turn_layer()
 void input_to_turn(Pyraminx& pyraminx, std::string turn){
     Corner input_corner;
     Direction dir = Direction::clockwise;
@@ -80,7 +81,7 @@ void input_to_turn(Pyraminx& pyraminx, std::string turn){
         printf("Invalid corner name. Use letters U, L, R, or B (case insensitive).\n");
         return;
         break;
-    }
+    }// switch
     if(turn_length == 3){
         if(turn[2] == '`'){
             dir = Direction::counterclockwise;
@@ -89,6 +90,6 @@ void input_to_turn(Pyraminx& pyraminx, std::string turn){
             printf("Unknown character at end of turn command. Use ` (tick) to specify inverted/counterclockwise turn.\n");
             return;
         }
-    }
+    } // if len 3
     pyraminx.turn_layer(input_corner, layer, dir);
-}
+}// input_to_turn
