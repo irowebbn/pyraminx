@@ -1,5 +1,5 @@
 CPPFLAGS = -Wall -g -std=c++11
-NAMES = main Face Pyraminx Eq_Pos_table
+NAMES = main Face Pyraminx Eq_Pos_Table
 OBJECTS = $(addsuffix .o, $(NAMES))
 EXEC = pyraminx
 
@@ -7,8 +7,8 @@ $(EXEC) : $(OBJECTS)
 	$(CXX) $(FLAGS) -o $@ $^ 
 
 main.o : Pyraminx.o main.cpp
-Pyraminx.o : Pyraminx.cpp Face.o Eq_Pos_table.o
-Eq_Pos_table.o : Eq_Pos_table.cpp
+Pyraminx.o : Pyraminx.cpp Face.o Eq_Pos_Table.o
+Eq_Pos_Table.o : Eq_Pos_Table.cpp
 Face.o : Face.cpp
 	$(CXX) $(CPPFLAGS) -c $^  
 
