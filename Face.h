@@ -56,6 +56,8 @@ struct Neighborhood{
 class Face{
 public:
     Face(Color center_color, Eq_Pos_Table& eq_pos_table);
+    // Return the color value of a specified location
+    Color get_triangle_color(Corner ref_corner, int layer, int entry);
     // Return the color values at they layer specified
     std::vector<Color> get_layer(Corner corner, int layer);
     // Change the color values at the layer specified.
@@ -88,6 +90,7 @@ private:
     Neighborhood neighbors;
     // Helper function for constructor
     void build_map(Corner reference_corner, Eq_Pos_Table& eq_pos_table);
+    friend class Pyraminx;
 };
 
 #endif // FACE_H

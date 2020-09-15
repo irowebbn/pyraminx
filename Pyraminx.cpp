@@ -12,7 +12,7 @@ Pyraminx::Pyraminx(){
     face_list.push_back(red_face);
     face_list.push_back(yellow_face);
     face_list.push_back(green_face); 
-   setNeighbors();
+   set_neighbors();
 }
 void Pyraminx::turn_layer(Corner corner, int layer, Direction dir){
     // To keep the middle piece fixed in our view,
@@ -99,6 +99,121 @@ void Pyraminx::scramble(int depth){
     }
 }
 
+int Pyraminx::get_heuristic(){
+    int num_interior = 24;
+    int num_corner = 4;
+    int num_edge = 12;
+    int interior_correct = count_correct_interior();
+    int corner_correct = count_correct_corner();
+    int edge_correct = count_correct_edge();
+
+    int h = ((num_corner - corner_correct)/3) + 
+        ((num_edge - edge_correct)/6) + 
+        ((num_interior - interior_correct)/9);
+    return h;
+}
+
+int Pyraminx::count_correct_interior(){
+    int count = 0;
+    int interior_loc[6] = {2, 5, 7, 10, 12, 14};
+    int interior_len = sizeof(interior_loc)/ sizeof(int);
+    for(int i = 0; i < face_list.size(); i++){
+        Color center_color = face_list[i]->get_center_color();
+        for(int j = 0; j< interior_len; j++){
+            if(face_list[i]->color_data[interior_loc[j]] == center_color){
+                count++;
+            }
+        }
+    }
+    //printf("Correct interior pieces: %i/24\n", count);
+    return count; 
+}
+
+int Pyraminx::count_correct_corner(){
+    Color blue_upper =     blue_face->get_triangle_color(Corner::U,0,0);
+    Color red_upper =       red_face->get_triangle_color(Corner::U,0,0);
+    Color yellow_upper = yellow_face->get_triangle_color(Corner::U,0,0);
+
+    Color blue_left =    blue_face->get_triangle_color(Corner::L,0,0);
+    Color red_left =      red_face->get_triangle_color(Corner::L,0,0);
+    Color green_left =  green_face->get_triangle_color(Corner::L,0,0);
+
+    Color blue_right =     blue_face->get_triangle_color(Corner::R,0,0);
+    Color green_right =   green_face->get_triangle_color(Corner::R,0,0);
+    Color yellow_right = yellow_face->get_triangle_color(Corner::R,0,0);
+
+    Color red_back =       red_face->get_triangle_color(Corner::B,0,0);
+    Color yellow_back = yellow_face->get_triangle_color(Corner::B,0,0);
+    Color green_back =   green_face->get_triangle_color(Corner::B,0,0);
+    
+    int upper_correct = (blue_upper == Color::blue) && (red_upper == Color::red) && (yellow_upper == Color::yellow);
+    int left_correct = (blue_left == Color::blue) && (red_left == Color::red) && (green_left == Color::green); 
+    int right_correct = (blue_right == Color::blue) && (yellow_right == Color::yellow) && (green_right == Color::green); 
+    int back_correct = (yellow_back == Color::yellow) && (red_back == Color::red) && (green_back == Color::green);  
+    //printf("Correct corner pieces: %i/4\n", upper_correct + left_correct + right_correct + back_correct);
+    return upper_correct + left_correct + right_correct + back_correct;
+}
+
+int Pyraminx::count_correct_edge(){
+    int count = 0;
+    // Check the edges between faces sharing the upper corner
+    std::shared_ptr<Face> current_face = blue_face;
+    for(int i = 0; i < 3; i++){
+        std::shared_ptr<Face> adjacent_face = current_face->neighbors.U_neighbor_right;
+        Color current_top = current_face->get_triangle_color(Corner::U, 1, 2);
+        Color current_bottom = current_face->get_triangle_color(Corner::U, 2, 4);
+        Color adjacent_top = adjacent_face->get_triangle_color(Corner::U, 1, 0);
+        Color adjacent_bottom = adjacent_face->get_triangle_color(Corner::U, 2, 0);
+        int top_correct = (current_top == current_face->get_center_color()) 
+            && (adjacent_top == adjacent_face->get_center_color());
+        int bottom_correct = (current_bottom == current_face->get_center_color()) 
+            && (adjacent_bottom == adjacent_face->get_center_color());
+        count = count + top_correct + bottom_correct;
+        current_face = adjacent_face;
+    }
+    // Check the edges between the bottom face (green) and the others
+    for(int i = 0; i < 3; i++){
+        std::shared_ptr<Face> adjacent_face;
+        Corner current_corner;
+        switch (i)
+        {
+        case 0:
+            current_corner = Corner::L;
+            adjacent_face = yellow_face;
+            break;
+        case 1:
+            current_corner = Corner::R;
+            adjacent_face = red_face;
+            break;
+        case 2:
+            current_corner = Corner::B;
+            adjacent_face = blue_face;
+            break;
+        }
+
+        Color current_left  = green_face->get_triangle_color(current_corner, 3, 2);
+        Color current_right = green_face->get_triangle_color(current_corner, 3, 4);
+
+        Color adjacent_right = adjacent_face->get_triangle_color(Corner::U, 3, 2);
+        Color adjacent_left = adjacent_face->get_triangle_color(Corner::U, 3, 4);
+
+        int left_correct = (current_left == Color::green) && (adjacent_left == adjacent_face->get_center_color());
+        int right_correct = (current_right == Color::green) && (adjacent_right == adjacent_face->get_center_color());
+
+        count = count + left_correct + right_correct;
+    }
+    //printf("Correct edge pieces: %i/12\n", count);
+    return count;
+}
+
+bool Pyraminx::is_solved(){
+    int interior_correct = count_correct_interior();
+    int corner_correct = count_correct_corner();
+    int edge_correct = count_correct_edge(); 
+
+    return (interior_correct == 24) && (corner_correct == 4) && (edge_correct == 12);
+}
+
 void Pyraminx::print(){
     for(int layer = 0; layer < 4; layer++){
         int top_row_len = 2*layer +1;
@@ -137,7 +252,7 @@ void Pyraminx::print(){
         printf("\n");
     }
 }
-void Pyraminx::setNeighbors(){
+void Pyraminx::set_neighbors(){
     Neighborhood neighbors;
     for(int i = 0; i < face_list.size(); i++){
         Color center_color = face_list[i]->get_center_color();

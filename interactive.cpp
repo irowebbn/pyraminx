@@ -32,6 +32,10 @@ int main(){
             }
             printf("\n");
             myPyraminx.print();
+            printf("H: %i\n", myPyraminx.get_heuristic());
+            if(myPyraminx.is_solved()){
+                printf("Solved!\n");
+            }
         } //if not empty
     }// while
 }// main

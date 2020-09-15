@@ -131,9 +131,13 @@ std::shared_ptr<Face> Face::get_sending_neighbor(Corner corner, Direction dir){
     }
     return get_sending_neighbor(corner, dir);
  }
-void Face::print_triangle(Corner ref_corner, int layer, int entry){
+
+Color Face::get_triangle_color(Corner ref_corner, int layer, int entry){
     Position lookup_pos{.reference_corner = ref_corner, .layer = layer, .entry = entry};
-    Color triangle_color = *(current_state.find(lookup_pos)->second);
+    return  *(current_state.find(lookup_pos)->second);
+}
+void Face::print_triangle(Corner ref_corner, int layer, int entry){
+    Color triangle_color = get_triangle_color(ref_corner, layer, entry);
     switch (triangle_color)
     {
     case Color::blue:

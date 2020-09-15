@@ -70,7 +70,7 @@ structure representing the puzzle as a whole. It has 4 members with pointers
 `Face` objects corresponding to the faces of the puzzle. It provides the
 functions `print()`, which prints the puzzle's current configuration,
 `turn_layer()`, which enacts a user-specified move, `scramble()`, which sets the
-puzzle to a random (solvable) state, and `setNeighbors()`, which establishes the
+puzzle to a random (solvable) state, and `set_neighbors()`, which establishes the
 relationship between the faces. 
 
 Each `Face` object contains information about the colors and their positions on
