@@ -30,12 +30,6 @@ struct node{
     const node* parent;
 };
 
-// Nice names for our weird data structures
-// A list of moves that lead to a node
-//typedef std::vector<move_type> move_list;
-// A node, which has an f value (cost) and a move list leading to it
-//typedef std::pair<int, move_list> node;
-
 // Comparison operator for our min-heap
 struct Compare{
     bool operator()(node* p1, node* p2 ){
@@ -59,7 +53,10 @@ void print_move_list(const node& current);
 int apply_moves(const node* newest_node, Pyraminx& pyraminx);
 // Undoes the move list needed to reach a node
 void undo_moves(const node* newest_node, Pyraminx& pyraminx);
+
 std::vector<move_type> get_move_list(const node* newest_node);
+
+void free_nodes(min_heap& to_expand);
 
 // Driver for autosolve test
 int main(){
@@ -100,6 +97,7 @@ int main(){
                 if(finished){
                     printf("Solved! Solution is: ");
                     print_move_list(*current);
+                    free_nodes(to_expand);
                     break;
                 }
                 else{
@@ -243,3 +241,10 @@ void print_move_list(const node& current){
     printf("\n");
 }
 
+void free_nodes(min_heap& to_expand){
+    while(!to_expand.empty()){
+        node* old_node = to_expand.top();
+        delete old_node;
+        to_expand.pop();
+    }
+}
