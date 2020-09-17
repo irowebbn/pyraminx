@@ -12,34 +12,54 @@ struct move_type{
     Direction dir;
 };
 
+struct node{
+    // Special constructor for root node
+    node(int cost){
+        this->cost = cost;
+        this->parent = nullptr;
+    }
+
+    // General constructor for node
+    node(int cost, move_type to_apply, const node* parent){
+        this->cost = cost;
+        this->to_apply = to_apply;
+        this->parent = parent;
+    }
+    int cost;
+    move_type to_apply;
+    const node* parent;
+};
+
 // Nice names for our weird data structures
 // A list of moves that lead to a node
-typedef std::vector<move_type> move_list;
+//typedef std::vector<move_type> move_list;
 // A node, which has an f value (cost) and a move list leading to it
-typedef std::pair<int, move_list> node;
+//typedef std::pair<int, move_list> node;
 
 // Comparison operator for our min-heap
 struct Compare{
-    bool operator()(node& p1, node& p2 ){
-        return p1.first > p2.first;
+    bool operator()(node* p1, node* p2 ){
+        return p1->cost > p2->cost;
     }
 };
 
 // Create a min-heap using a STL priority queue
-typedef std::priority_queue<node, std::vector<node>, Compare> min_heap;
+// Make this hold pointers!!
+typedef std::priority_queue<node*, std::vector<node*>, Compare> min_heap;
 
 // Given a node, generate the children nodes, calculate their f values (costs), 
 // and put them in the min-heap
-void enqueue_children(min_heap& to_expand, const node& parent, Pyraminx& pyraminx);
+void enqueue_children(min_heap& to_expand, const node* parent, Pyraminx& pyraminx, int g);
 // Helper function for enqueue children that enqueues the children corresponding 
 // to all the possible moves from a given corner of the puzzle
-void enqueue_corner(min_heap& to_expand, const node& parent, Pyraminx& pyraminx, const Corner& ref_corner);
+void enqueue_corner(min_heap& to_expand, const node* parent, Pyraminx& pyraminx, const Corner& ref_corner, int g);
 // Prints the move list of a node
 void print_move_list(const node& current);
-// Applies the move list needed to reach a node
-void apply_moves(const node& current, Pyraminx& pyraminx);
+// Applies the move list needed to reach a node. Returns cost to reach node.
+int apply_moves(const node* newest_node, Pyraminx& pyraminx);
 // Undoes the move list needed to reach a node
-void undo_moves(const node& current, Pyraminx& pyraminx);
+void undo_moves(const node* newest_node, Pyraminx& pyraminx);
+std::vector<move_type> get_move_list(const node* newest_node);
 
 // Driver for autosolve test
 int main(){
@@ -65,26 +85,26 @@ int main(){
             int g = 0;
             int h = myPyraminx.get_heuristic();
             int f = g + h;
-            move_list moves_so_far;
+    
             min_heap to_expand;
-            to_expand.push(node(f, moves_so_far));
+            
+            to_expand.push(new node(f));
 
             // Explore tree
             bool finished;
             while(!to_expand.empty()){
-                node current = to_expand.top();
+                node* current = to_expand.top();
                 to_expand.pop();
-                apply_moves(current, myPyraminx);
-                // Debug prints print_move_list(current);
+                g = apply_moves(current, myPyraminx);
                 finished = myPyraminx.is_solved();
                 if(finished){
                     printf("Solved! Solution is: ");
-                    print_move_list(current);
+                    print_move_list(*current);
                     break;
                 }
                 else{
                     count++;
-                    enqueue_children(to_expand, current, myPyraminx);
+                    enqueue_children(to_expand, current, myPyraminx, g);
                     undo_moves(current, myPyraminx);
                 }
             }
@@ -99,7 +119,7 @@ int main(){
 }
 
 // Given a node, add nodes for all the possible move types.
-void enqueue_children(min_heap& to_expand, const node& parent, Pyraminx& pyraminx){
+void enqueue_children(min_heap& to_expand, const node* parent, Pyraminx& pyraminx, int g){
     for(int i = 0; i < 4; i++){
         Corner ref_corner;
         switch (i)
@@ -117,12 +137,12 @@ void enqueue_children(min_heap& to_expand, const node& parent, Pyraminx& pyramin
             ref_corner = Corner::B;
             break;
         }
-        enqueue_corner(to_expand, parent, pyraminx, ref_corner);
+        enqueue_corner(to_expand, parent, pyraminx, ref_corner, g);
     }
 }
 
 // For a given corner, create a node for all the possible layers and directions
-void enqueue_corner(min_heap& to_expand, const node& parent, Pyraminx& pyraminx, const Corner& ref_corner){
+void enqueue_corner(min_heap& to_expand, const node* parent, Pyraminx& pyraminx, const Corner& ref_corner, int g){
     // for each possible layer and direction:
     // apply move
     // calculate new f value
@@ -131,10 +151,8 @@ void enqueue_corner(min_heap& to_expand, const node& parent, Pyraminx& pyraminx,
     Direction move_dir;
     Direction undo_dir;
     int h_child;
-    int g_parent;
     int g_child;
     int f_child; 
-
     for(int layer = 0; layer < 4; layer++){ // iterate layers
         for(int dir = 0; dir < 2; dir++){ // iterate directions
             if(dir == 0){
@@ -148,47 +166,58 @@ void enqueue_corner(min_heap& to_expand, const node& parent, Pyraminx& pyraminx,
             // Get cost by applying move to pyraminx
             pyraminx.turn_layer(ref_corner, layer, move_dir); 
             h_child = pyraminx.get_heuristic(); 
-            g_parent = parent.second.size();
-            g_child = g_parent + 1;
+            g_child = g + 1;
             f_child = g_child + h_child;
             move_type child_move{ .ref_corner=ref_corner, .layer= layer, .dir=move_dir};
-            move_list child_move_list = parent.second;
-            child_move_list.push_back(child_move);
-            node child(f_child, child_move_list);
+        
+            //node child{.cost = f_child, .to_apply = child_move, .parent= parent};//, child_move_list);
             // Add to min-heap
-            to_expand.push(child);
+            to_expand.push(new node(f_child, child_move, parent));
             // Undo test to calculate cost
             pyraminx.turn_layer(ref_corner, layer, undo_dir);
         }
     }
 }
 
-void apply_moves(const node& current, Pyraminx& pyraminx){
-    for(move_type move : current.second){
-        pyraminx.turn_layer(move.ref_corner, move.layer, move.dir);
+int apply_moves(const node* newest_node, Pyraminx& pyraminx){
+    std::vector<move_type> move_list = get_move_list(newest_node);
+    for(auto it = move_list.rbegin(); it != move_list.rend(); ++it){
+        pyraminx.turn_layer(it->ref_corner, it->layer, it->dir);
     }
+    return move_list.size(); // new g value
 }
 
-void undo_moves(const node& current, Pyraminx& pyraminx){
+void undo_moves(const node* newest_node, Pyraminx& pyraminx){
     Direction undo_dir;
-    for(auto it = current.second.rbegin(); it != current.second.rend(); ++it){
-        if((*it).dir == Direction::clockwise){
+    std::vector<move_type> move_list = get_move_list(newest_node);
+    for(move_type move : move_list){
+        if (move.dir == Direction::clockwise){
             undo_dir = Direction::counterclockwise;
         }
         else{
             undo_dir = Direction::clockwise;
         }
-        pyraminx.turn_layer((*it).ref_corner, (*it).layer, undo_dir);
+        pyraminx.turn_layer(move.ref_corner, move.layer, undo_dir);
     }
+}
+std::vector<move_type> get_move_list(const node* newest_node){
+    std::vector<move_type> move_list;
+    const node* current = newest_node;
+    while(current->parent != nullptr){
+        move_list.push_back(current->to_apply);
+        current = current->parent;
+    }
+    return move_list;
 }
 
 void print_move_list(const node& current){
     char corner;
     int layer;
     char dir = ' ';
-    for(move_type move : current.second){
-        layer = move.layer;
-        switch (move.ref_corner)
+    std::vector<move_type> move_list = get_move_list(&current);
+    for(auto it = move_list.rbegin(); it != move_list.rend(); ++it){
+        layer = it->layer;
+        switch (it->ref_corner)
         {
         case Corner::U:
             corner = 'U';
@@ -203,7 +232,7 @@ void print_move_list(const node& current){
             corner = 'B';
             break;
         }
-        if(move.dir == Direction::counterclockwise){
+        if(it->dir == Direction::counterclockwise){
             dir = '`';
         }
         else{
