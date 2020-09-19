@@ -12,6 +12,7 @@ struct move_type{
     Direction dir;
 };
 
+// Data structure for a new move to try in the sequence
 struct node{
     // Special constructor for root node
     node(int cost){
@@ -53,9 +54,9 @@ void print_move_list(const node& current);
 int apply_moves(const node* newest_node, Pyraminx& pyraminx);
 // Undoes the move list needed to reach a node
 void undo_moves(const node* newest_node, Pyraminx& pyraminx);
-
+// Get the list of moves leading from the root to the leaf node
 std::vector<move_type> get_move_list(const node* newest_node);
-
+// Release the nodes from memory for the next case
 void free_nodes(min_heap& to_expand);
 
 // Driver for autosolve test
