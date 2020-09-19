@@ -1,0 +1,108 @@
+[01;32mirowe_bbn@instance-1[00m:[01;34m~/pyraminx[00m$ ./[K[Kls
+Eq_Pos_Table.cpp  Face.cpp  [0m[01;35mGUI_Output.png[0m  Pyraminx.h  [01;32mautosolve[0m      [01;32minteractive[0m      log.txt         screenlog.0
+Eq_Pos_Table.h    Face.h    Makefile        Pyraminx.o  autosolve.cpp  interactive.cpp  [01;35mmem_layout.png[0m  [01;35mstandard_view.jpg[0m
+Eq_Pos_Table.o    Face.o    Pyraminx.cpp    README.md   autosolve.o    interactive.o    run1.txt        test_input
+[01;32mirowe_bbn@instance-1[00m:[01;34m~/pyraminx[00m$ cd autosolve.cpp= autosolve.cpp[1P autosolve.cpp[1P autosolve.cpp[1P autosolve.cppv autosolve.cppi autosolve.cppm autosolve.cpp
+[?1000h[?2004h[?1049h[22;0;0t[?1h=[?2004h[1;45r[?12h[?12l[22;2t[22;1t[27m[29m[m[H[2J[?25l[45;1H"autosolve.cpp" 250L, 7975C[2;1H▽[6n[2;1H  [1;1H[>c]10;?]11;?[1;1H[34m// to all the possible moves from a given corner of the puzzle[m
+[32mvoid[m enqueue_corner(min_heap& to_expand, [32mconst[m node* parent, Pyraminx& pyraminx, [32mconst[m Corner& ref_corner, [32mint[m g);
+[34m// Prints the move list of a node[m
+[32mvoid[m print_move_list([32mconst[m node& current);
+[34m// Applies the move list needed to reach a node. Returns cost to reach node.[m
+[32mint[m apply_moves([32mconst[m node* newest_node, Pyraminx& pyraminx);
+[34m// Undoes the move list needed to reach a node[m
+[32mvoid[m undo_moves([32mconst[m node* newest_node, Pyraminx& pyraminx);
+
+std::vector<move_type> get_move_list([32mconst[m node* newest_node);
+
+[32mvoid[m free_nodes(min_heap& to_expand);
+
+[34m// Driver for autosolve test[m
+[32mint[m main(){
+    [34m// Open file to write out number of expanded nodes:[m
+    std::ofstream logfile;
+    logfile.open ([31m"log.txt"[m, std::ios::out | std::ios::app );
+    logfile << [31m"k, nodes expanded[m[35m\n[m[31m"[m;
+    logfile.close();[22;5H[32mint[m k_start = [31m9[m;
+    [32mint[m k_stop = [31m20[m;
+    [32mint[m num_instances = [31m5[m;
+    [34m// For each k, solve [m[31m5[m[34m puzzles randomized with k moves[m
+    [38;5;130mfor[m([32mint[m k = k_start; k <= k_stop; k++){[27;9H[32mfloat[m count = [31m0[m;[28;9H[38;5;130mfor[m([32mint[m i = [31m0[m; i < num_instances; i++){[29;13HPyraminx myPyraminx;[30;13HmyPyraminx.scramble(k);[31;13Hprintf([31m"Solving puzzle randomized with [m[35m%i[m[31m moves...[m[35m\n[m[31m"[m, k);[32;13HmyPyraminx.print();[34;13H[34m// Create and enqueue root node[m[35;13H[32mint[m g = [31m0[m;[36;13H[32mint[m h = myPyraminx.get_heuristic();[37;13H[32mint[m f = g + h;[39;13Hmin_heap to_expand;[41;13Hto_expand.push([38;5;130mnew[m node(f));[43;13H[34m// Explore tree[m[44;13H[32mbool[m finished;[45;147H69,19[9C22%[22;19H[?25h[?25l[45;137H~@k[22;19H[45;137H   [23;19H[45;147H70[23;19H[?25h[?25l[45;137H~@k[23;19H[45;137H   [24;19H[45;148H1[24;19H[?25h[?25l[45;137H~@k[24;19H[45;137H   [25;19H[45;148H2[25;19H[?25h[?25l[45;137H~@k[25;19H[45;137H   [24;19H[45;148H1[24;19H[?25h[?25l[45;137H~@k[24;19H[45;137H   [23;19H[45;148H0[23;19H[?25h[?25l[45;137H~@k[23;19H[45;137H   [22;19H[45;147H69[22;19H[?25h[?25l[45;137H~@k[22;19H[45;137H   [22;20H[45;150H20[22;20H[?25h[?25l[45;137Hi[22;20H[45;137H [22;20H[45;1H[1m-- INSERT --[m[45;13H[K[45;147H69,20[9C22%[22;20H[?25h[?25l;[22;20H[K[45;150H19[22;19H[?25h[?25l[31m1[m;[45;150H20[22;20H[?25h[?25l[31m0[m;[45;151H1[22;21H[?25h[45;1H[K[22;20H[?25l[45;137H^[[22;20H[45;137H  [22;21H[45;147H69,20[9C22%[22;20H[?25h[?25l[45;137H:[22;20H[45;137H[K[45;1H:[?2004h[?25hw[?25l[?25hq[?25l[?25h[?25l[?1000l[?2004l"autosolve.cpp" 250L, 7976C written[23;2t[23;1t[22;2t[22;1t[23;2t[23;1t
+[?2004l[?1l>[?25h[?1049l[23;0;0t[01;32mirowe_bbn@instance-1[00m:[01;34m~/pyraminx[00m$ make release
+g++ -Wall -std=c++11 -O3   -c -o autosolve.o autosolve.cpp
+[01m[Kautosolve.cpp:[m[K In function ‘[01m[Kvoid print_move_list(const node&)[m[K’:
+[01m[Kautosolve.cpp:239:15:[m[K [01;35m[Kwarning: [m[K‘[01m[Kcorner[m[K’ may be used uninitialized in this function [[01;35m[K-Wmaybe-uninitialized[m[K]
+         [01;35m[Kprintf("%c%i%c ", corner, layer, dir)[m[K;
+         [01;35m[K~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+g++ -Wall -std=c++11 -O3 -o autosolve Face.o Pyraminx.o Eq_Pos_Table.o autosolve.o
+[01;32mirowe_bbn@instance-1[00m:[01;34m~/pyraminx[00m$ ./autosolve 
+Solving puzzle randomized with 10 moves...
+[1;33mY[0m[1;31mR[0m[1;31mR[0m[1;31mR[0m[1;34mB[0m[1;34mB[0m[1;33mY[0m [1;31mR[0m [1;34mB[0m[1;31mR[0m[1;33mY[0m[1;33mY[0m[1;33mY[0m[1;33mY[0m[1;32mG[0m
+ [1;34mB[0m[1;34mB[0m[1;31mR[0m[1;31mR[0m[1;34mB[0m [1;31mR[0m[1;33mY[0m[1;33mY[0m [1;31mR[0m[1;33mY[0m[1;33mY[0m[1;34mB[0m[1;34mB[0m 
+  [1;32mG[0m[1;32mG[0m[1;32mG[0m [1;31mR[0m[1;32mG[0m[1;34mB[0m[1;34mB[0m[1;33mY[0m [1;32mG[0m[1;32mG[0m[1;32mG[0m  
+   [1;34mB[0m [1;32mG[0m[1;31mR[0m[1;32mG[0m[1;32mG[0m[1;32mG[0m[1;33mY[0m[1;32mG[0m [1;34mB[0m   
+     [1;31mR[0m[1;34mB[0m[1;33mY[0m[1;33mY[0m[1;31mR[0m[1;34mB[0m[1;33mY[0m
+      [1;34mB[0m[1;31mR[0m[1;32mG[0m[1;32mG[0m[1;34mB[0m 
+       [1;31mR[0m[1;32mG[0m[1;33mY[0m  
+        [1;31mR[0m   
+Solved! Solution is: U3  L2` R2  B0` L3` U0` B0` L1  R1  
+Solving puzzle randomized with 10 moves...
+[1;34mB[0m[1;34mB[0m[1;34mB[0m[1;33mY[0m[1;33mY[0m[1;34mB[0m[1;34mB[0m [1;33mY[0m [1;31mR[0m[1;31mR[0m[1;32mG[0m[1;34mB[0m[1;32mG[0m[1;32mG[0m[1;32mG[0m
+ [1;33mY[0m[1;31mR[0m[1;31mR[0m[1;31mR[0m[1;31mR[0m [1;32mG[0m[1;33mY[0m[1;33mY[0m [1;31mR[0m[1;32mG[0m[1;33mY[0m[1;33mY[0m[1;32mG[0m 
+  [1;33mY[0m[1;33mY[0m[1;33mY[0m [1;31mR[0m[1;32mG[0m[1;34mB[0m[1;34mB[0m[1;31mR[0m [1;34mB[0m[1;34mB[0m[1;34mB[0m  
+   [1;33mY[0m [1;31mR[0m[1;31mR[0m[1;34mB[0m[1;34mB[0m[1;33mY[0m[1;31mR[0m[1;31mR[0m [1;34mB[0m   
+     [1;32mG[0m[1;32mG[0m[1;31mR[0m[1;31mR[0m[1;34mB[0m[1;32mG[0m[1;32mG[0m
+      [1;32mG[0m[1;33mY[0m[1;32mG[0m[1;32mG[0m[1;32mG[0m 
+       [1;34mB[0m[1;33mY[0m[1;31mR[0m  
+        [1;33mY[0m   
+Solved! Solution is: U0  U1  R2  L1` B2  U1  R0` R1` 
+Solving puzzle randomized with 10 moves...
+[1;34mB[0m[1;33mY[0m[1;32mG[0m[1;32mG[0m[1;32mG[0m[1;32mG[0m[1;32mG[0m [1;31mR[0m [1;33mY[0m[1;33mY[0m[1;33mY[0m[1;33mY[0m[1;33mY[0m[1;31mR[0m[1;33mY[0m
+ [1;31mR[0m[1;31mR[0m[1;31mR[0m[1;32mG[0m[1;32mG[0m [1;34mB[0m[1;31mR[0m[1;31mR[0m [1;33mY[0m[1;33mY[0m[1;33mY[0m[1;31mR[0m[1;31mR[0m 
+  [1;33mY[0m[1;33mY[0m[1;31mR[0m [1;34mB[0m[1;34mB[0m[1;34mB[0m[1;31mR[0m[1;32mG[0m [1;31mR[0m[1;31mR[0m[1;31mR[0m  
+   [1;32mG[0m [1;34mB[0m[1;32mG[0m[1;32mG[0m[1;34mB[0m[1;34mB[0m[1;32mG[0m[1;32mG[0m [1;31mR[0m   
+     [1;33mY[0m[1;34mB[0m[1;34mB[0m[1;33mY[0m[1;33mY[0m[1;34mB[0m[1;34mB[0m
+      [1;34mB[0m[1;32mG[0m[1;32mG[0m[1;34mB[0m[1;33mY[0m 
+       [1;32mG[0m[1;34mB[0m[1;34mB[0m  
+        [1;31mR[0m   
+Solved! Solution is: L2  U1` R0  B3  R0  L1  
+Solving puzzle randomized with 10 moves...
+[1;33mY[0m[1;32mG[0m[1;31mR[0m[1;31mR[0m[1;34mB[0m[1;34mB[0m[1;34mB[0m [1;31mR[0m [1;32mG[0m[1;32mG[0m[1;32mG[0m[1;34mB[0m[1;34mB[0m[1;33mY[0m[1;34mB[0m
+ [1;33mY[0m[1;34mB[0m[1;31mR[0m[1;31mR[0m[1;33mY[0m [1;32mG[0m[1;31mR[0m[1;31mR[0m [1;32mG[0m[1;33mY[0m[1;33mY[0m[1;32mG[0m[1;34mB[0m 
+  [1;33mY[0m[1;33mY[0m[1;33mY[0m [1;32mG[0m[1;32mG[0m[1;34mB[0m[1;31mR[0m[1;33mY[0m [1;34mB[0m[1;31mR[0m[1;31mR[0m  
+   [1;31mR[0m [1;33mY[0m[1;34mB[0m[1;32mG[0m[1;33mY[0m[1;33mY[0m[1;33mY[0m[1;32mG[0m [1;33mY[0m   
+     [1;34mB[0m[1;31mR[0m[1;34mB[0m[1;34mB[0m[1;34mB[0m[1;32mG[0m[1;31mR[0m
+      [1;31mR[0m[1;32mG[0m[1;32mG[0m[1;33mY[0m[1;32mG[0m 
+       [1;31mR[0m[1;34mB[0m[1;31mR[0m  
+        [1;32mG[0m   
+Solved! Solution is: U2  L1` R1  L0  R3` L2  B1` B0  
+Solving puzzle randomized with 10 moves...
+[1;32mG[0m[1;32mG[0m[1;32mG[0m[1;33mY[0m[1;33mY[0m[1;33mY[0m[1;33mY[0m [1;31mR[0m [1;34mB[0m[1;34mB[0m[1;34mB[0m[1;34mB[0m[1;31mR[0m[1;31mR[0m[1;31mR[0m
+ [1;34mB[0m[1;31mR[0m[1;31mR[0m[1;34mB[0m[1;34mB[0m [1;32mG[0m[1;31mR[0m[1;33mY[0m [1;31mR[0m[1;32mG[0m[1;33mY[0m[1;31mR[0m[1;33mY[0m 
+  [1;34mB[0m[1;34mB[0m[1;34mB[0m [1;32mG[0m[1;32mG[0m[1;34mB[0m[1;33mY[0m[1;33mY[0m [1;31mR[0m[1;34mB[0m[1;32mG[0m  
+   [1;31mR[0m [1;34mB[0m[1;32mG[0m[1;34mB[0m[1;34mB[0m[1;32mG[0m[1;32mG[0m[1;33mY[0m [1;32mG[0m   
+     [1;32mG[0m[1;31mR[0m[1;31mR[0m[1;31mR[0m[1;33mY[0m[1;33mY[0m[1;34mB[0m
+      [1;31mR[0m[1;33mY[0m[1;32mG[0m[1;32mG[0m[1;31mR[0m 
+       [1;33mY[0m[1;33mY[0m[1;32mG[0m  
+        [1;33mY[0m   
+Solved! Solution is: R3` B1` U1` R1  B2  U3` B0  B1` L1` 
+Solving puzzle randomized with 11 moves...
+[1;34mB[0m[1;33mY[0m[1;33mY[0m[1;34mB[0m[1;34mB[0m[1;33mY[0m[1;32mG[0m [1;31mR[0m [1;33mY[0m[1;31mR[0m[1;31mR[0m[1;33mY[0m[1;31mR[0m[1;31mR[0m[1;33mY[0m
+ [1;33mY[0m[1;31mR[0m[1;31mR[0m[1;33mY[0m[1;33mY[0m [1;32mG[0m[1;32mG[0m[1;34mB[0m [1;32mG[0m[1;32mG[0m[1;33mY[0m[1;33mY[0m[1;32mG[0m 
+  [1;34mB[0m[1;34mB[0m[1;34mB[0m [1;33mY[0m[1;32mG[0m[1;34mB[0m[1;34mB[0m[1;32mG[0m [1;31mR[0m[1;31mR[0m[1;33mY[0m  
+   [1;33mY[0m [1;32mG[0m[1;33mY[0m[1;33mY[0m[1;34mB[0m[1;32mG[0m[1;32mG[0m[1;34mB[0m [1;32mG[0m   
+     [1;34mB[0m[1;32mG[0m[1;32mG[0m[1;31mR[0m[1;34mB[0m[1;34mB[0m[1;31mR[0m
+      [1;31mR[0m[1;32mG[0m[1;32mG[0m[1;31mR[0m[1;31mR[0m 
+       [1;34mB[0m[1;34mB[0m[1;31mR[0m  
+        [1;31mR[0m   
+Solved! Solution is: B2  U1` L3  U0  B0` L1  
+Solving puzzle randomized with 11 moves...
+[1;31mR[0m[1;33mY[0m[1;34mB[0m[1;32mG[0m[1;32mG[0m[1;32mG[0m[1;32mG[0m [1;33mY[0m [1;34mB[0m[1;34mB[0m[1;34mB[0m[1;33mY[0m[1;31mR[0m[1;32mG[0m[1;33mY[0m
+ [1;33mY[0m[1;34mB[0m[1;31mR[0m[1;33mY[0m[1;33mY[0m [1;31mR[0m[1;33mY[0m[1;33mY[0m [1;32mG[0m[1;34mB[0m[1;33mY[0m[1;32mG[0m[1;33mY[0m 
+  [1;31mR[0m[1;31mR[0m[1;34mB[0m [1;32mG[0m[1;31mR[0m[1;34mB[0m[1;31mR[0m[1;33mY[0m [1;34mB[0m[1;34mB[0m[1;33mY[0m  
+   [1;31mR[0m [1;33mY[0m[1;33mY[0m[1;31mR[0m[1;32mG[0m[1;31mR[0m[1;31mR[0m[1;32mG[0m [1;31mR[0m   
+     [1;34mB[0m[1;34mB[0m[1;32mG[0m[1;34mB[0m[1;32mG[0m[1;32mG[0m[1;34mB[0m
+      [1;34mB[0m[1;33mY[0m[1;32mG[0m[1;31mR[0m[1;32mG[0m 
+       [1;31mR[0m[1;31mR[0m[1;34mB[0m  
+        [1;32mG[0m   
+Killed
+[01;32mirowe_bbn@instance-1[00m:[01;34m~/pyraminx[00m$ 

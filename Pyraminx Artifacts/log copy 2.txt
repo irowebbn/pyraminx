@@ -1,0 +1,11 @@
+k, nodes expanded
+3, 169
+k, nodes expanded
+3, 27.6
+4, 6513.8
+5, 7579.8
+6, 44610.6
+k, nodes expanded
+3, 2442.4
+4, 3641.8
+5, 4882

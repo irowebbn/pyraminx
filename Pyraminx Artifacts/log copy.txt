@@ -1,0 +1,4 @@
+k, nodes expanded
+9, 1.86204e+06
+k, nodes expanded
+10, 3.35544e+06
