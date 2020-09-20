@@ -169,7 +169,6 @@ void enqueue_corner(min_heap& to_expand, const node* parent, Pyraminx& pyraminx,
             f_child = g_child + h_child;
             move_type child_move{ .ref_corner=ref_corner, .layer= layer, .dir=move_dir};
         
-            //node child{.cost = f_child, .to_apply = child_move, .parent= parent};//, child_move_list);
             // Add to min-heap
             to_expand.push(new node(f_child, child_move, parent));
             // Undo test to calculate cost

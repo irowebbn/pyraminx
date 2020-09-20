@@ -1,7 +1,7 @@
 # README
 Modeling the (Master) Pyraminx
 
-Isaac Rowe, University of Kentucky
+University of Kentucky
 
 CS463G Fall 2020
 
