@@ -19,10 +19,10 @@ autosolver output, or an overview of how the puzzle is implemented, see
 
 ## How to run
 To build this program, ensure you have a C++ compiler that supports C++11. Run
-`make release` to build the program. `make debug` will also build the program, 
-but without optimization and with debugging symbols. To run the autosolver,
-run `./autosolve`. To run the interactive puzzle from assignment 1, run 
-`./interactive`
+`make` to build the program. `make release` or `make debug` will also build the 
+program, but with/without optimization and with/without debugging symbols. 
+To run the autosolver, run `./autosolve`. Logs are written to log.txt.
+To run the interactive puzzle from assignment 1, run `./interactive`.
 
 This has been successfully tested with the Apple clang version 11.0.3 compiler
 on a x86_64-apple-darwin19.5.0 architecture.
