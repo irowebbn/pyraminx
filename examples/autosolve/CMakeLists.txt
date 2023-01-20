@@ -1,0 +1,4 @@
+add_executable(pyraminx_autosolve autosolve.cpp)
+
+target_link_libraries(pyraminx_autosolve PRIVATE pyraminx)
+set_property(TARGET pyraminx_autosolve PROPERTY CXX_STANDARD 11)

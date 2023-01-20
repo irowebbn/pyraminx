@@ -170,6 +170,11 @@ void enqueue_corner(min_heap& to_expand, const node* parent, Pyraminx& pyraminx,
             move_type child_move{ .ref_corner=ref_corner, .layer= layer, .dir=move_dir};
         
             // Add to min-heap
+            /**std::cout << "Adding node (corner: " << (int) ref_corner <<
+                "layer: " << layer << 
+                "direction: " << dir <<  
+                ") with cost " << f_child << std::endl;
+            **/
             to_expand.push(new node(f_child, child_move, parent));
             // Undo test to calculate cost
             pyraminx.turn_layer(ref_corner, layer, undo_dir);

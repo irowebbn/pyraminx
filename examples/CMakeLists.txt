@@ -1,0 +1,2 @@
+add_subdirectory(autosolve)
+add_subdirectory(cli)
