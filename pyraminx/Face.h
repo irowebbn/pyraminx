@@ -27,7 +27,7 @@ enum class Direction{
 };
 
 // Define our possible corners
-enum class Corner{
+enum class Vertex{
     U,
     L,
     R,
@@ -36,7 +36,7 @@ enum class Corner{
 
 // Holds data to refer to a specific position on a face
 struct Position{
-    Corner reference_corner;
+    Vertex reference_corner;
     int layer;
     int entry;
 };
@@ -57,22 +57,22 @@ class Face{
 public:
     Face(Color center_color, Eq_Pos_Table& eq_pos_table);
     // Return the color value of a specified location
-    Color get_triangle_color(Corner ref_corner, int layer, int entry);
+    Color get_triangle_color(Vertex ref_corner, int layer, int entry);
     // Return the color values at they layer specified
-    std::vector<Color> get_layer(Corner corner, int layer);
+    std::vector<Color> get_layer(Vertex corner, int layer);
     // Change the color values at the layer specified.
     // Returns the old values (to be given to the adjacent face)
-    std::vector<Color> update_layer(Corner corner, int layer, std::vector<Color> new_layer);
+    std::vector<Color> update_layer(Vertex corner, int layer, std::vector<Color> new_layer);
     void print();
     // Print just the entry at the specified location
-    void print_triangle(Corner ref_corner, int layer, int entry);
+    void print_triangle(Vertex ref_corner, int layer, int entry);
     // Used by Pyraminx constructor to define relationship between faces
     void set_neighbors(Neighborhood neighbors);
     // Return the center color of this face
     Color get_center_color(){return center_color;};
     // Get the correct adjacent face when a turn is specified
-    std::shared_ptr<Face> get_sending_neighbor(Corner corner, Direction dir);
-    std::shared_ptr<Face> get_receiving_neighbor(Corner corner, Direction dir);
+    std::shared_ptr<Face> get_sending_neighbor(Vertex corner, Direction dir);
+    std::shared_ptr<Face> get_receiving_neighbor(Vertex corner, Direction dir);
     // Rotates the whole face the desired direction. 
     // Used when a level 3 turn is specified.
     void turn_face(Direction dir);
@@ -89,7 +89,7 @@ private:
     // Set of pointers to adjacent faces
     Neighborhood neighbors;
     // Helper function for constructor
-    void build_map(Corner reference_corner, Eq_Pos_Table& eq_pos_table);
+    void build_map(Vertex reference_corner, Eq_Pos_Table& eq_pos_table);
     friend class Pyraminx;
 };
 

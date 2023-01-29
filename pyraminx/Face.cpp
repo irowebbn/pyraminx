@@ -11,11 +11,11 @@ Face::Face(Color center_color, Eq_Pos_Table& eq_pos_table){
     case Color::blue:
     case Color::red:
     case Color::yellow:
-        build_map(Corner::U, eq_pos_table);
+        build_map(Vertex::U, eq_pos_table);
         break;
     // Different case for Green since it doesn't have a U corner
     case Color::green:
-        build_map(Corner::B, eq_pos_table);
+        build_map(Vertex::B, eq_pos_table);
         break;
     default:
         printf("Invalid color for face.\n");
@@ -23,7 +23,7 @@ Face::Face(Color center_color, Eq_Pos_Table& eq_pos_table){
     }
 }
 
-void Face::build_map(Corner reference_corner, Eq_Pos_Table& eq_pos_table){
+void Face::build_map(Vertex reference_corner, Eq_Pos_Table& eq_pos_table){
     Position current_position;
     current_position.reference_corner = reference_corner;
     for(int layer = 0; layer < 4; layer++){
@@ -39,7 +39,7 @@ void Face::build_map(Corner reference_corner, Eq_Pos_Table& eq_pos_table){
         }
     }
 }
-std::vector<Color> Face::get_layer(Corner corner, int layer){
+std::vector<Color> Face::get_layer(Vertex corner, int layer){
     std::vector<Color> desired_layer;
     Position to_access;
     to_access.layer =  layer;
@@ -53,7 +53,7 @@ std::vector<Color> Face::get_layer(Corner corner, int layer){
 
 // There's some repetition here, but I didn't want to have to transverse the 
 // layer twice by calling get_layer.
-std::vector<Color> Face::update_layer(Corner corner, int layer, std::vector<Color> new_layer){
+std::vector<Color> Face::update_layer(Vertex corner, int layer, std::vector<Color> new_layer){
     std::vector<Color> old_layer;
     Position to_access;
     to_access.layer =  layer;
@@ -81,10 +81,10 @@ void Face::turn_face(Direction dir){
     }
 }
 
-std::shared_ptr<Face> Face::get_sending_neighbor(Corner corner, Direction dir){
+std::shared_ptr<Face> Face::get_sending_neighbor(Vertex corner, Direction dir){
     switch (corner)
     {
-    case Corner::U:
+    case Vertex::U:
         if(dir == Direction::clockwise){
             return neighbors.U_neighbor_right;
         }
@@ -92,7 +92,7 @@ std::shared_ptr<Face> Face::get_sending_neighbor(Corner corner, Direction dir){
             return neighbors.U_neighbor_left;
         }
         break;
-    case Corner::L:
+    case Vertex::L:
         if(dir == Direction::clockwise){
             return neighbors.L_neighbor_right;
         }
@@ -100,7 +100,7 @@ std::shared_ptr<Face> Face::get_sending_neighbor(Corner corner, Direction dir){
             return neighbors.L_neighbor_left;
         }
         break;
-    case Corner::R:
+    case Vertex::R:
         if(dir == Direction::clockwise){
             return neighbors.R_neighbor_right;
         }
@@ -108,7 +108,7 @@ std::shared_ptr<Face> Face::get_sending_neighbor(Corner corner, Direction dir){
             return neighbors.R_neighbor_left;
         }
         break;
-    case Corner::B:
+    case Vertex::B:
         if(dir == Direction::clockwise){
             return neighbors.B_neighbor_right;
         }
@@ -122,7 +122,7 @@ std::shared_ptr<Face> Face::get_sending_neighbor(Corner corner, Direction dir){
     }
 }
 
- std::shared_ptr<Face> Face::get_receiving_neighbor(Corner corner, Direction dir){
+ std::shared_ptr<Face> Face::get_receiving_neighbor(Vertex corner, Direction dir){
     if(dir == Direction::clockwise){
         dir = Direction::counterclockwise;
     }
@@ -132,11 +132,11 @@ std::shared_ptr<Face> Face::get_sending_neighbor(Corner corner, Direction dir){
     return get_sending_neighbor(corner, dir);
  }
 
-Color Face::get_triangle_color(Corner ref_corner, int layer, int entry){
+Color Face::get_triangle_color(Vertex ref_corner, int layer, int entry){
     Position lookup_pos{.reference_corner = ref_corner, .layer = layer, .entry = entry};
     return  *(current_state.find(lookup_pos)->second);
 }
-void Face::print_triangle(Corner ref_corner, int layer, int entry){
+void Face::print_triangle(Vertex ref_corner, int layer, int entry){
     Color triangle_color = get_triangle_color(ref_corner, layer, entry);
     switch (triangle_color)
     {
@@ -157,12 +157,12 @@ void Face::print_triangle(Corner ref_corner, int layer, int entry){
     }
 }
 void Face::print(){
-    Corner ref_corner;
+    Vertex ref_corner;
     if(center_color == Color::green){
-        ref_corner = Corner::B;
+        ref_corner = Vertex::B;
     }
     else{
-        ref_corner = Corner::U;
+        ref_corner = Vertex::U;
     }
     for(int layer = 0; layer < 4; layer++){
         int row_len = 2*layer + 1;

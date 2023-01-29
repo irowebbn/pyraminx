@@ -1,5 +1,18 @@
 #include "Pyraminx.h"
 
+struct Move{
+    Vertex vertex;
+    Direction direction;
+    int layer;
+
+    Move(){
+        assert(layer<=0 && layer <=3);
+    }
+};
+
+// class Piece{
+
+// }
 Pyraminx::Pyraminx(){
     Eq_Pos_Table eq_pos_table;
 
@@ -14,7 +27,7 @@ Pyraminx::Pyraminx(){
     face_list.push_back(green_face); 
    set_neighbors();
 }
-void Pyraminx::turn_layer(Corner corner, int layer, Direction dir){
+void Pyraminx::turn_layer(Vertex corner, int layer, Direction dir){
     // To keep the middle piece fixed in our view,
     // treat middle layer twists as counter-twists of all other layers
     if(layer == 2){
@@ -33,7 +46,7 @@ void Pyraminx::turn_layer(Corner corner, int layer, Direction dir){
         // the green face as the reference face. 
         // Otherwise use the blue face as the reference.
         std::shared_ptr<Face> ref_face;
-        if(corner == Corner::B){
+        if(corner == Vertex::B){
             ref_face = green_face;
         }
         else{
@@ -60,19 +73,19 @@ void Pyraminx::turn_layer(Corner corner, int layer, Direction dir){
     }
 }
 
-std::shared_ptr<Face> Pyraminx::get_opposite_face(Corner corner){
+std::shared_ptr<Face> Pyraminx::get_opposite_face(Vertex corner){
     switch (corner)
     {
-    case Corner::U:
+    case Vertex::U:
         return green_face;
         break;
-    case Corner::L:
+    case Vertex::L:
         return yellow_face;
         break;
-    case Corner::R:
+    case Vertex::R:
         return red_face;
         break;
-    case Corner::B:
+    case Vertex::B:
         return blue_face;
         break;
     default:
@@ -93,7 +106,7 @@ void Pyraminx::scramble(int depth){
     // That way I can randomly choose a corner and direction.
     for(int i = 0; i < depth; i++){
         int random_layer = corner_layer_dist(generator);
-        Corner random_corner = static_cast<Corner>(corner_layer_dist(generator));
+        Vertex random_corner = static_cast<Vertex>(corner_layer_dist(generator));
         Direction random_direction = static_cast<Direction>(dir_dist(generator));
         turn_layer(random_corner, random_layer, random_direction);
     }
@@ -130,21 +143,21 @@ int Pyraminx::count_correct_interior(){
 }
 
 int Pyraminx::count_correct_corner(){
-    Color blue_upper =     blue_face->get_triangle_color(Corner::U,0,0);
-    Color red_upper =       red_face->get_triangle_color(Corner::U,0,0);
-    Color yellow_upper = yellow_face->get_triangle_color(Corner::U,0,0);
+    Color blue_upper =     blue_face->get_triangle_color(Vertex::U,0,0);
+    Color red_upper =       red_face->get_triangle_color(Vertex::U,0,0);
+    Color yellow_upper = yellow_face->get_triangle_color(Vertex::U,0,0);
 
-    Color blue_left =    blue_face->get_triangle_color(Corner::L,0,0);
-    Color red_left =      red_face->get_triangle_color(Corner::L,0,0);
-    Color green_left =  green_face->get_triangle_color(Corner::L,0,0);
+    Color blue_left =    blue_face->get_triangle_color(Vertex::L,0,0);
+    Color red_left =      red_face->get_triangle_color(Vertex::L,0,0);
+    Color green_left =  green_face->get_triangle_color(Vertex::L,0,0);
 
-    Color blue_right =     blue_face->get_triangle_color(Corner::R,0,0);
-    Color green_right =   green_face->get_triangle_color(Corner::R,0,0);
-    Color yellow_right = yellow_face->get_triangle_color(Corner::R,0,0);
+    Color blue_right =     blue_face->get_triangle_color(Vertex::R,0,0);
+    Color green_right =   green_face->get_triangle_color(Vertex::R,0,0);
+    Color yellow_right = yellow_face->get_triangle_color(Vertex::R,0,0);
 
-    Color red_back =       red_face->get_triangle_color(Corner::B,0,0);
-    Color yellow_back = yellow_face->get_triangle_color(Corner::B,0,0);
-    Color green_back =   green_face->get_triangle_color(Corner::B,0,0);
+    Color red_back =       red_face->get_triangle_color(Vertex::B,0,0);
+    Color yellow_back = yellow_face->get_triangle_color(Vertex::B,0,0);
+    Color green_back =   green_face->get_triangle_color(Vertex::B,0,0);
     
     int upper_correct = (blue_upper == Color::blue) && (red_upper == Color::red) && (yellow_upper == Color::yellow);
     int left_correct = (blue_left == Color::blue) && (red_left == Color::red) && (green_left == Color::green); 
@@ -160,10 +173,10 @@ int Pyraminx::count_correct_edge(){
     std::shared_ptr<Face> current_face = blue_face;
     for(int i = 0; i < 3; i++){
         std::shared_ptr<Face> adjacent_face = current_face->neighbors.U_neighbor_right;
-        Color current_top = current_face->get_triangle_color(Corner::U, 1, 2);
-        Color current_bottom = current_face->get_triangle_color(Corner::U, 2, 4);
-        Color adjacent_top = adjacent_face->get_triangle_color(Corner::U, 1, 0);
-        Color adjacent_bottom = adjacent_face->get_triangle_color(Corner::U, 2, 0);
+        Color current_top = current_face->get_triangle_color(Vertex::U, 1, 2);
+        Color current_bottom = current_face->get_triangle_color(Vertex::U, 2, 4);
+        Color adjacent_top = adjacent_face->get_triangle_color(Vertex::U, 1, 0);
+        Color adjacent_bottom = adjacent_face->get_triangle_color(Vertex::U, 2, 0);
         int top_correct = (current_top == current_face->get_center_color()) 
             && (adjacent_top == adjacent_face->get_center_color());
         int bottom_correct = (current_bottom == current_face->get_center_color()) 
@@ -174,19 +187,19 @@ int Pyraminx::count_correct_edge(){
     // Check the edges between the bottom face (green) and the others
     for(int i = 0; i < 3; i++){
         std::shared_ptr<Face> adjacent_face;
-        Corner current_corner;
+        Vertex current_corner;
         switch (i)
         {
         case 0:
-            current_corner = Corner::L;
+            current_corner = Vertex::L;
             adjacent_face = yellow_face;
             break;
         case 1:
-            current_corner = Corner::R;
+            current_corner = Vertex::R;
             adjacent_face = red_face;
             break;
         case 2:
-            current_corner = Corner::B;
+            current_corner = Vertex::B;
             adjacent_face = blue_face;
             break;
         }
@@ -194,8 +207,8 @@ int Pyraminx::count_correct_edge(){
         Color current_left  = green_face->get_triangle_color(current_corner, 3, 2);
         Color current_right = green_face->get_triangle_color(current_corner, 3, 4);
 
-        Color adjacent_right = adjacent_face->get_triangle_color(Corner::U, 3, 2);
-        Color adjacent_left = adjacent_face->get_triangle_color(Corner::U, 3, 4);
+        Color adjacent_right = adjacent_face->get_triangle_color(Vertex::U, 3, 2);
+        Color adjacent_left = adjacent_face->get_triangle_color(Vertex::U, 3, 4);
 
         int left_correct = (current_left == Color::green) && (adjacent_left == adjacent_face->get_center_color());
         int right_correct = (current_right == Color::green) && (adjacent_right == adjacent_face->get_center_color());
@@ -222,15 +235,15 @@ void Pyraminx::print(){
             printf(" ");
         }
         for(int entry = 0; entry < bottom_row_len; entry++){
-            red_face->print_triangle(Corner::L, 3-layer, (bottom_row_len - 1) - entry);
+            red_face->print_triangle(Vertex::L, 3-layer, (bottom_row_len - 1) - entry);
         }
         printf(" ");
         for(int entry = 0; entry < top_row_len; entry++){
-            blue_face->print_triangle(Corner::U, layer, entry);
+            blue_face->print_triangle(Vertex::U, layer, entry);
         }
         printf(" ");
         for(int entry = 0; entry < bottom_row_len; entry++){
-            yellow_face->print_triangle(Corner::R, 3-layer, (bottom_row_len - 1) - entry);
+            yellow_face->print_triangle(Vertex::R, 3-layer, (bottom_row_len - 1) - entry);
         }
         for(int j = 0; j < (7-bottom_row_len)/2; j++){
                 printf(" ");
@@ -244,7 +257,7 @@ void Pyraminx::print(){
                 printf(" ");
         }
         for(int entry = row_len - 1; entry >= 0; entry--){
-            green_face->print_triangle(Corner::B, layer, entry);
+            green_face->print_triangle(Vertex::B, layer, entry);
         }
         for(int j = 0; j < (7 - row_len)/2; j++){
                 printf(" ");
