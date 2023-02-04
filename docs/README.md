@@ -6,7 +6,7 @@ mkdir build
 cd build
 cmake -S .. -B . # You can also specify a specific build generator with `-G` option
 cmake --build . --config Release  # You can also run your specified build tool directly, e.g. `make` or `ninja`
-``
+```
 
 Currently, there are two executables build under `examples/cli` and `examples/autosolve`. 
 
